@@ -11,6 +11,8 @@ export default function ProductCard({ product, delay = "0.6s" }) {
             src={product.image || "/placeholder.png"}
             alt={product.title || product.name || "Product Image"}
             fill
+            quality={90}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
             className="object-cover"
           />
         </div>

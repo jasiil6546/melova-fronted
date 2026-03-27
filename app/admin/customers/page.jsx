@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import api from "@/lib/axios";
 
 export default function AdminCustomers() {
   const { token } = useAuth();
@@ -16,13 +17,8 @@ export default function AdminCustomers() {
     async function fetchCustomers() {
       if (!token) return;
       try {
-        const response = await fetch(`${API_URL}api/auth/customers/`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        if (!response.ok) throw new Error("API Error");
-        const data = await response.json();
+        const response = await api.get(`/api/auth/customers/`);
+        const data = response.data;
         const customersArray = Array.isArray(data) ? data : data.results || [];
         setCustomers(customersArray);
         setFilteredCustomers(customersArray);
@@ -33,7 +29,7 @@ export default function AdminCustomers() {
       }
     }
     fetchCustomers();
-  }, [token, API_URL]);
+  }, [token]);
 
 
   useEffect(() => {

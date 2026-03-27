@@ -2,21 +2,17 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
+import api from "@/lib/axios";
 
 export default function MyOrdersPage() {
   const { token, user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
-
   const fetchOrders = React.useCallback(async () => {
     if (!token) return;
     try {
-      const res = await axios.get(`${API_URL}api/shop/orders/my_orders/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get(`/api/shop/orders/my_orders/`);
       // Sort orders by newest first
       const sortedOrders = res.data.sort(
         (a, b) => new Date(b.created_at) - new Date(a.created_at)
@@ -27,7 +23,7 @@ export default function MyOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, API_URL]);
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchOrders();

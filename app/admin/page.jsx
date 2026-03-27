@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import api from "@/lib/axios";
 
 export default function AdminDashboard() {
   const { token } = useAuth();
@@ -22,22 +23,14 @@ export default function AdminDashboard() {
     async function fetchData() {
       if (!token) return;
       
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
-      
       try {
         const [ordersRes, productsRes] = await Promise.all([
-          fetch(`${API_BASE_URL}api/shop/orders/`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch(`${API_BASE_URL}api/shop/products/`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
+          api.get(`/api/shop/orders/`),
+          api.get(`/api/shop/products/`),
         ]);
 
-        if (!ordersRes.ok || !productsRes.ok) throw new Error("API Error");
-
-        const ordersData = await ordersRes.json();
-        const productsData = await productsRes.json();
+        const ordersData = ordersRes.data;
+        const productsData = productsRes.data;
 
         const orders = Array.isArray(ordersData)
           ? ordersData

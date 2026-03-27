@@ -33,8 +33,15 @@ export function AuthProvider({ children }) {
   }, []);
 
   const handleAuthSuccess = (authPayload) => {
+    // Response can be { "access": "...", "refresh": "...", "user": { ... } }
+    // OR { "token": "...", "user": { ... } }
     const accessToken = authPayload.access || authPayload.token;
     const { refresh, user } = authPayload;
+
+    if (!accessToken) {
+        console.error("No access token found in auth payload:", authPayload);
+        return null;
+    }
 
     const userRole = user?.is_superuser ? "superadmin" : user?.is_staff ? "admin" : "user";
 
@@ -51,18 +58,24 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, password) => {
-    const res = await api.post("api/auth/login/", { email, password });
+    // Standardize login payload based on backend required fields (email, password)
+    const res = await api.post("/api/auth/login/", { 
+      email, 
+      password 
+    });
     return handleAuthSuccess(res.data);
   };
 
   const register = async (payload) => {
-    const res = await api.post("api/auth/register/", payload);
+    // Add username as a fallback during registration
+    const data = { ...payload, username: payload.email };
+    const res = await api.post("/api/auth/register/", data);
     return handleAuthSuccess(res.data);
   };
 
   const loginWithGoogle = async (googleIdToken) => {
     try {
-      const res = await api.post("api/auth/google/", {
+      const res = await api.post("/api/auth/google/", {
         id_token: googleIdToken,
       });
       return handleAuthSuccess(res.data);
@@ -73,7 +86,7 @@ export function AuthProvider({ children }) {
   };
 
   const updateProfile = async (payload) => {
-    const res = await api.patch("api/auth/me/", payload);
+    const res = await api.patch("/api/auth/me/", payload); 
 
     // UserProfileView returns the user object directly on PATCH,
     // wrapped in { user: ... } only when using retrieve.
@@ -88,7 +101,7 @@ export function AuthProvider({ children }) {
 
     if (refreshToken) {
       try {
-        await api.post("api/auth/logout/", { refresh: refreshToken });
+        await api.post("/api/auth/logout/", { refresh: refreshToken });
       } catch (err) {
         console.error("Logout error:", err);
       }

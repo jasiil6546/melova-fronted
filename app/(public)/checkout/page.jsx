@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
+import api from "@/lib/axios";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -13,7 +13,6 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(1);
   const [cart, setCart] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -44,9 +43,7 @@ export default function CheckoutPage() {
     const fetchCart = async () => {
       if (!token) return;
       try {
-        const res = await axios.get(`${API_URL}api/shop/cart/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get(`/api/shop/cart/`);
         setCart(res.data);
       } catch (err) {
         console.error("Error fetching cart for checkout:", err);
@@ -69,7 +66,7 @@ export default function CheckoutPage() {
         email: user.email || "",
       }));
     }
-  }, [user, token, API_URL]);
+  }, [user, token]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -105,11 +102,7 @@ export default function CheckoutPage() {
         pincode: formData.zipCode,
       };
 
-      const res = await axios.post(
-        `${API_URL}api/shop/cart/checkout/`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post(`/api/shop/cart/checkout/`, payload);
 
       const razorpayOrderId = res.data.razorpay_order_id;
       const amountInPaise = Math.round(cart.total_price * 100);
@@ -122,15 +115,11 @@ export default function CheckoutPage() {
         description: "Melova Chocolate Order",
         order_id: razorpayOrderId,
         handler: async (response) => {
-          const verifyRes = await axios.post(
-            `${API_URL}api/shop/verify-payment/`,
-            {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+          const verifyRes = await api.post(`/api/shop/verify-payment/`, {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
 
           if (verifyRes.data.status === "Payment Successful") {
             window.dispatchEvent(new Event("cartUpdated"));

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
+import api from "@/lib/axios";
 
 export default function ProductDetailsClient({ product }) {
   const router = useRouter();
@@ -83,11 +83,10 @@ export default function ProductDetailsClient({ product }) {
       const API_URL =
         process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
 
-      await axios.post(
-        `${API_URL}api/shop/cart/add_item/`,
-        { variant_id: selectedVariant.id, quantity: 1 },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.post(`/api/shop/cart/add_item/`, { 
+        variant_id: selectedVariant.id, 
+        quantity: 1 
+      });
 
       window.dispatchEvent(new Event("cartUpdated"));
       if (!silent) alert("Added to cart!");
@@ -137,22 +136,31 @@ export default function ProductDetailsClient({ product }) {
               onMouseLeave={handleMouseUp}
             >
               {currentImages.map((img, i) => (
-                <div key={i} style={{ flex: "0 0 100%", minWidth: "100%" }}>
+                <a 
+                  key={i} 
+                  href={img} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  style={{ flex: "0 0 100%", minWidth: "100%", display: "block" }}
+                >
                   <Image
                     draggable={false}
                     src={img}
                     alt={`${product.title || product.name} image ${i + 1}`}
-                    width={600}
-                    height={600}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"  
+                    width={1000}
+                    height={1000}
+                    quality={95}
+                    priority={i === 0}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
                     style={{
                       width: "100%",
                       height: "auto",
                       aspectRatio: "1/1",
                       objectFit: "cover",
+                      cursor: "zoom-in",
                     }}
                   />
-                </div>
+                </a>
               ))}
             </div>
           </div>

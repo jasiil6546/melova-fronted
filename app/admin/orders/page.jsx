@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import api from "@/lib/axios";
 
 export default function AdminOrders() {
   const router = useRouter();
@@ -10,20 +11,14 @@ export default function AdminOrders() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
   const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     async function fetchOrders() {
       if (!token) return;
       try {
-        const response = await fetch(`${API_URL}api/shop/orders/`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        if (!response.ok) throw new Error("API Error");
-        const data = await response.json();
+        const response = await api.get(`/api/shop/orders/`);
+        const data = response.data;
         const ordersArray = Array.isArray(data) ? data : data.results || [];
         setOrders(ordersArray);
         setFilteredOrders(ordersArray);
@@ -34,7 +29,7 @@ export default function AdminOrders() {
       }
     }
     fetchOrders();
-  }, [token, API_URL]);
+  }, [token]);
 
   useEffect(() => {
     const filtered = orders.filter((order) => {
@@ -84,21 +79,18 @@ export default function AdminOrders() {
   if (!confirmDelete) return;
 
   try {
-    const response = await fetch(`${API_URL}api/shop/orders/${id}/`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.delete(`/api/shop/orders/${id}/`);
 
-    if (!response.ok) throw new Error("Failed to delete");
-
+    if (response.status === 204 || (response.status >= 200 && response.status < 300)) {
     // Remove deleted order from state (instant UI update)
     const updatedOrders = orders.filter((order) => order.id !== id);
     setOrders(updatedOrders);
     setFilteredOrders(updatedOrders);
 
     alert("Order deleted successfully");
+    } else {
+        throw new Error("Failed to delete");
+    }
   } catch (error) {
     console.error("Delete error:", error);
     alert("Failed to delete order");

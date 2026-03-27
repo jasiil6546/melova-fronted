@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import axios from "axios";
+import api from "@/lib/axios";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ export default function AdminAddProduct() {
   const { token, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [productImage, setProductImage] = useState(null);
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
 
   const [variants, setVariants] = useState([
@@ -104,35 +105,7 @@ const addVariant = () => {
     return URL.createObjectURL(img);
   };
 
-  // Function to refresh the token using your existing refresh token
-  const refreshAccessToken = async () => {
-    const refreshToken = sessionStorage.getItem("melova_refresh");
-
-    if (!refreshToken) {
-      return null;
-    }
-
-    try {
-      const response = await axios.post(
-        `${API_URL}api/token/refresh/`,
-        { refresh: refreshToken }
-      );
-
-      const newAccessToken = response.data.access;
-
-      // Update token in localStorage and axios headers
-      sessionStorage.setItem("melova_token", newAccessToken);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
-
-      return newAccessToken;
-    } catch (error) {
-      console.error("Token refresh failed:", error);
-      // If refresh fails, logout the user
-      logout();
-      router.push('/admin/login?redirect=/admin/products/add');
-      return null;
-    }
-  };
+  // Token refresh and absolute URLs are now handled automatically by the api instance in @/lib/axios
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -149,13 +122,19 @@ const handleSubmit = async (e) => {
     const title = document.getElementById('productName').value;
     const introduction = document.getElementById('productIntro').value;
     const description = document.getElementById('productDescription').value;
+    const basePrice = document.getElementById('basePrice').value;
     
-    console.log('Form values:', { title, introduction, description });
+    console.log('Form values:', { title, introduction, description, basePrice });
     
     // Basic Product Info
     formData.append('title', title);
     formData.append('introduction', introduction);
     formData.append('details', description);
+    formData.append('price', basePrice);
+    
+    if (productImage) {
+      formData.append('image', productImage);
+    }
     
     // Loop through variants and add each field individually
     variants.forEach((variant, index) => {
@@ -191,60 +170,26 @@ const handleSubmit = async (e) => {
     let currentToken = sessionStorage.getItem("melova_token");
     console.log('Using token:', currentToken ? 'Token exists' : 'No token');
     
-    // Make the request
-    let response = await fetch(`${API_URL}api/shop/products/`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${currentToken}`,
-      },
-      body: formData,
-    });
+    // Make the request using shared api instance for auto-refresh
+    const response = await api.post(`/api/shop/products/`, formData);
     
-    
+    console.log('Product created successfully:', response.data);
 
-      // If token expired (401), try to refresh it
-      if (response.status === 401) {
-        console.log("Token expired, attempting to refresh...");
-
-        const newToken = await refreshAccessToken();
-
-        if (newToken) {
-          // Retry the request with the new token
-          response = await fetch(`${API_URL}api/shop/products/`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${newToken}`,
-            },
-            body: formData,
-          });
-        }
-      }
-
-      // Check if the request was successful
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Server error details:', errorData);
-        throw new Error(JSON.stringify(errorData));
-      }
-
-      const result = await response.json();
-      console.log('Product created successfully:', result);
-
-      // Success - redirect to products list
-      router.push('/admin/products');
+    // Success - redirect to products list
+    router.push('/admin/products');
 
     } catch (err) {
       console.error('Submission error:', err);
 
       // Check if it's an authentication error
-      if (err.message.includes('401') || err.message.includes('Unauthorized') || err.message.includes('token')) {
+      if (err.response?.status === 401) {
         setError('Session expired. Please login again.');
         logout();
         setTimeout(() => {
           router.push('/admin/login?redirect=/admin/products/add');
         }, 1500);
       } else {
-        setError(err.message || 'Failed to create product');
+        setError(err.response?.data ? JSON.stringify(err.response.data) : (err.message || 'Failed to create product'));
       }
     } finally {
       setLoading(false);
@@ -390,7 +335,49 @@ const handleSubmit = async (e) => {
               </div>
               <div className="card-body p-4 p-md-5">
                 <div className="row g-4">
-                  <div className="col-md-8">
+                  <div className="col-md-3">
+                    <label className="form-label">Featured Product Image</label>
+                    <div 
+                      className="border-2 border-dashed rounded-xl p-3 text-center cursor-pointer hover:bg-stone-50 transition-all border-stone-200"
+                      onClick={() => document.getElementById('mainImageInput').click()}
+                    >
+                      {productImage ? (
+                        <div className="position-relative">
+                        <a 
+                          href={URL.createObjectURL(productImage)} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="d-block"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Image
+                            src={URL.createObjectURL(productImage)}
+                            alt="Main Preview"
+                            width={400}
+                            height={400}
+                            quality={100}
+                            className="rounded-lg object-fit-cover mx-auto shadow-md hover:scale-[1.02] transition-transform duration-200"
+                            style={{ height: '240px', width: '240px', cursor: 'zoom-in' }}
+                          />
+                        </a>
+                          <p className="mt-2 text-xs text-stone-500">Click to change</p>
+                        </div>
+                      ) : (
+                        <div className="py-4">
+                          <i className="fas fa-cloud-upload-alt text-3xl text-stone-300 mb-2"></i>
+                          <p className="small text-stone-500 mb-0">Select Main Image</p>
+                        </div>
+                      )}
+                      <input 
+                        id="mainImageInput"
+                        type="file" 
+                        className="d-none" 
+                        accept="image/*"
+                        onChange={(e) => setProductImage(e.target.files[0])}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-5">
                     <div className="mb-4">
                       <label htmlFor="productName" className="form-label">
                         Product Title
@@ -561,15 +548,24 @@ const handleSubmit = async (e) => {
                         {variant.images.map((imgUrl, imgIndex) => (
                           <div className="col-lg-6" key={imgIndex}>
                             <div className="variant-image-input-group">
-                              <Image
-                                src={getImagePreview(imgUrl) || "https://placehold.co/100x100?text=No+Image"}
-                                className="variant-image-preview"
-                                alt="Preview"
-                                width={50}
-                                height={50}
-                                unoptimized
-                                onError={(e) => (e.target.src = "https://placehold.co/100x100?text=No+Image")}
-                              />
+                              <a 
+                                href={getImagePreview(imgUrl)} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="leading-none"
+                              >
+                                <Image
+                                  src={getImagePreview(imgUrl) || "https://placehold.co/100x100?text=No+Image"}
+                                  className="variant-image-preview shadow-sm hover:opacity-80 transition-opacity"
+                                  alt="Preview"
+                                  width={100}
+                                  height={100}
+                                  quality={95}
+                                  unoptimized={typeof imgUrl !== "string"}
+                                  onError={(e) => (e.target.src = "https://placehold.co/100x100?text=No+Image")}
+                                  style={{ cursor: 'zoom-in' }}
+                                />
+                              </a>
                               <input
                                 type="file"
                                 accept="image/*"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getProducts } from "@/lib/product-data";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import api from "@/lib/axios";
 
 export default function AdminProducts() {
   const { token } = useAuth();
@@ -91,15 +92,9 @@ export default function AdminProducts() {
       )
     ) {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
-        const res = await fetch(`${API_URL}api/shop/products/${id}/`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await api.delete(`/api/shop/products/${id}/`);
 
-        if (res.ok) {
+        if (res.status === 204 || (res.status >= 200 && res.status < 300)) {
           setProducts((prev) => prev.filter((p) => p.id !== id));
           console.log(`Product ${id} deleted successfully.`);
         } else {
@@ -229,22 +224,26 @@ export default function AdminProducts() {
                     {/* ID */}
                     <td className="px-3 py-2 font-medium">{product.id}</td>
 
-                    {/* Image */}
-                    <td className="px-3 py-2">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 relative">
+                    <td className="px-3 py-2 leading-none">
+                      <Link 
+                        href={`/admin/edit-product/${product.id}`}
+                        className="block w-12 h-12 rounded-lg overflow-hidden bg-gray-100 relative hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition-all duration-200 shadow-sm"
+                        title="Edit Product"
+                      >
                         {product.image ? (
                           <Image
                             src={product.image}
                             alt={product.title || "product image"}
                             fill
-                            className="object-cover"
+                            quality={90}
+                            className="object-contain"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-1">
-                            No Image
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-1 font-medium bg-gray-100">
+                            N/A
                           </div>
                         )}
-                      </div>
+                      </Link>
                     </td>
 
                     {/* Name */}

@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import axios from "axios";
+import api from "@/lib/axios";
 
 export default function Header() {
   const { user, role, logout, token } = useAuth();
@@ -13,6 +13,11 @@ export default function Header() {
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
 
@@ -52,9 +57,7 @@ export default function Header() {
         return;
       }
       try {
-        const res = await axios.get(`${API_URL}api/shop/cart/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get(`/api/shop/cart/`);
         const totalItems = res.data.items.reduce((acc, item) => acc + item.quantity, 0);
         setCartCount(totalItems);
       } catch (err) {
@@ -121,7 +124,7 @@ export default function Header() {
             <div className="hidden lg:flex items-center space-x-6">
               {/* Profile Dropdown */}
               <div className="relative" ref={dropdownRef}>
-                {user ? (
+                {mounted && user ? (
                   <>
                     <button
                       onClick={() =>
@@ -186,7 +189,7 @@ export default function Header() {
                       </div>
                     </div>
                   </>
-                ) : (
+                ) : mounted && !user ? (
                   <Link
                     href="/login"
                     className="flex items-center space-x-2 text-stone-300 hover:text-amber-400 font-medium text-sm transition-colors"
@@ -194,7 +197,7 @@ export default function Header() {
                     <i className="fas fa-user text-lg"></i>
                     <span>Login</span>
                   </Link>
-                )}
+                ) : null}
               </div>
 
               {/* CTA Button */}
@@ -323,7 +326,7 @@ export default function Header() {
             <div className="h-px bg-white/10 my-2"></div>
 
             <div className="pt-2">
-              {user ? (
+              {mounted && user ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 px-2 py-3 bg-white/5 rounded-xl border border-white/10">
                     <div className="w-10 h-10 rounded-full bg-amber-600 flex items-center justify-center text-white font-bold text-lg">
@@ -381,7 +384,7 @@ export default function Header() {
                     </a>
                   </div>
                 </div>
-              ) : (
+              ) : mounted && !user ? (
                 <Link
                   href="/login"
                   className="flex items-center justify-center w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl border border-white/20 transition-colors font-medium"
@@ -390,7 +393,7 @@ export default function Header() {
                   <i className="fas fa-user mr-2"></i>
                   Login / Sign Up
                 </Link>
-              )}
+              ) : null}
             </div>
           </nav>
         </div>

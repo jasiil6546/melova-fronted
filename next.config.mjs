@@ -37,6 +37,34 @@ const nextConfig = {
         hostname: "placehold.co",
       },
     ],
+    qualities: [75, 90, 95, 100],
+  },
+  experimental: {
+    serverActions: {},
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api/auth/login",
+        destination: "https://api.mymelova.com/api/auth/login/",
+      },
+      {
+        source: "/api/auth/register",
+        destination: "https://api.mymelova.com/api/auth/register/",
+      },
+      {
+        source: "/api/shop/products",
+        destination: "https://api.mymelova.com/api/shop/products/",
+      },
+      {
+        source: "/api/:path*",
+        destination: "https://api.mymelova.com/api/:path*",
+      },
+      {
+        source: "/media/:path*",
+        destination: "https://api.mymelova.com/media/:path*",
+      },
+    ];
   },
 };
 

@@ -4,15 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
+import api from "@/lib/axios";
 
 export default function CartPage() {
   const router = useRouter();
   const { user, token } = useAuth();
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
 
   const btnPrimary =
     "block w-full bg-[#9e7c29] text-white text-center py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition";
@@ -26,16 +24,14 @@ export default function CartPage() {
   const fetchCart = React.useCallback(async () => {
     if (!token) return;
     try {
-      const res = await axios.get(`${API_URL}api/shop/cart/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get(`/api/shop/cart/`);
       setCart(res.data);
     } catch (err) {
       console.error("Error fetching cart:", err);
     } finally {
       setLoading(false);
     }
-  }, [token, API_URL]);
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchCart();
@@ -45,11 +41,10 @@ export default function CartPage() {
   const updateQuantity = async (variantId, newQuantity) => {
     if (newQuantity < 1) return;
     try {
-      const res = await axios.post(
-        `${API_URL}api/shop/cart/update_item/`,
-        { variant_id: variantId, quantity: newQuantity },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post(`/api/shop/cart/update_item/`, { 
+        variant_id: variantId, 
+        quantity: newQuantity 
+      });
       setCart(res.data);
     } catch (err) {
       alert("Failed to update quantity");
@@ -58,11 +53,9 @@ export default function CartPage() {
 
   const removeItem = async (variantId) => {
     try {
-      const res = await axios.post(
-        `${API_URL}api/shop/cart/remove_item/`,
-        { variant_id: variantId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post(`/api/shop/cart/remove_item/`, { 
+        variant_id: variantId 
+      });
       setCart(res.data);
     } catch (err) {
       alert("Failed to remove item");

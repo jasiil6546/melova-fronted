@@ -5,8 +5,9 @@ import ProductDetailsClient from "@/components/ProductDetailsClient";
 import ProductsScroll from "@/components/ProductsScroll";
 
 export async function generateMetadata({ params }) {
+  const resolvedParams = await params;
   const products = await getProducts();
-  const product = products.find((p) => p.id === parseInt(params.id));
+  const product = products.find((p) => p.id === parseInt(resolvedParams.id));
 
   if (!product) return { title: "Product Not Found" };
 
@@ -43,7 +44,7 @@ export default async function ProductDetailsPage({ params }) {
       <div className="container">
         <div className="row">
           <ProductDetailsClient product={product} />
-        </div>
+        </div>                  
 
         {relatedProducts.length > 0 && (
           <div className="related-products mt-5 pt-5 border-top">
