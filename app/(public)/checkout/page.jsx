@@ -177,7 +177,7 @@ export default function CheckoutPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 lg:p-8">
             {/* STEP 1 */}
             {step === 1 && (
-              <>
+              <form onSubmit={(e) => { e.preventDefault(); nextStep(); }}>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">
                   Delivery details
                 </h2>
@@ -198,6 +198,7 @@ export default function CheckoutPage() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
+                      required
                     />
                   </div>
 
@@ -257,12 +258,12 @@ export default function CheckoutPage() {
                 </div>
 
                 <button
-                  onClick={nextStep}
+                  type="submit"
                   className="mt-8 w-full rounded-lg bg-amber-800 py-2.5 text-sm font-semibold text-white hover:bg-amber-900 transition"
                 >
                   Continue to payment
                 </button>
-              </>
+              </form>
             )}
 
             {/* STEP 2 */}
@@ -339,6 +340,7 @@ export default function CheckoutPage() {
                         src={item.variant_details.images[0]?.image || "/img/placeholder_product.png"}
                         alt={item.variant_details.name}
                         fill
+                        quality={90}
                         className="rounded-lg object-cover border border-gray-100"
                       />
                     </div>

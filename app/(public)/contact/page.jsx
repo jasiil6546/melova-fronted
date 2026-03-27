@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { RevealWrapper, RevealItem } from "@/components/animations/RevealAnimation";
 
 export const metadata = {
   title: "Melova - Contact Us | Reach Out",
@@ -11,58 +12,62 @@ export const metadata = {
 export default function Contact() {
   return (
     <>
-      {/* Page Header Start */}
       <div className="page-header bg-section parallaxie">
-        <div className="container">
+        <RevealWrapper className="container">
           <div className="row align-items-center">
             <div className="col-lg-12">
               <div className="page-header-box">
-                <h1 className="text-anime-style-2" data-cursor="-opaque">
-                  Contact <span>us</span>
-                </h1>
-                <nav className="wow fadeInUp">
-                  <ol className="breadcrumb">
-                    <li className="breadcrumb-item">
-                      <Link href="/">home</Link>
-                    </li>
-                    <li className="bread" aria-current="page">
-                      contact us
-                    </li>
-                  </ol>
-                </nav>
+                <RevealItem>
+                  <h1 className="text-anime-style-2" data-cursor="-opaque">
+                    Contact <span>us</span>
+                  </h1>
+                </RevealItem>
+                <RevealItem className="wow fadeInUp">
+                  <nav>
+                    <ol className="breadcrumb">
+                      <li className="breadcrumb-item">
+                        <Link href="/">home</Link>
+                      </li>
+                      <li className="bread" aria-current="page">
+                        contact us
+                      </li>
+                    </ol>
+                  </nav>
+                </RevealItem>
               </div>
             </div>
           </div>
-        </div>
+        </RevealWrapper>
       </div>
-      {/* Page Header End */}
 
-      {/* Page Contact Us Start */}
       <div className="page-contact-us bg-section">
-        <div className="container">
+        <RevealWrapper className="container">
           <div className="row align-items-center">
             <div className="col-lg-6">
               <div className="contact-us-content">
                 <div className="section-title">
-                  <h3 className="wow fadeInUp">Contact us</h3>
-                  <h2 className="text-anime-style-2" data-cursor="-opaque">
-                    We&apos;re here to chat and share the{" "}
-                    <span>love for pastries</span>
-                  </h2>
-                  <p className="wow fadeInUp" data-wow-delay="0.2s">
-                    Feel free to reach out — we&apos;re just a message away with
-                    something sweet to say!
-                  </p>
+                  <RevealItem>
+                    <h3 className="wow fadeInUp">Contact us</h3>
+                  </RevealItem>
+                  <RevealItem>
+                    <h2 className="text-anime-style-2" data-cursor="-opaque">
+                      We&apos;re here to chat and share the{" "}
+                      <span>love for pastries</span>
+                    </h2>
+                  </RevealItem>
+                  <RevealItem>
+                    <p className="wow fadeInUp" data-wow-delay="0.2s">
+                      Feel free to reach out — we&apos;re just a message away with
+                      something sweet to say!
+                    </p>
+                  </RevealItem>
                 </div>
 
-                <div
-                  className="contact-info-list wow fadeInUp"
-                  data-wow-delay="0.4s"
-                >
-                  <div className="contact-info-item">
+                <div className="contact-info-list wow fadeInUp" data-wow-delay="0.4s">
+                  <RevealItem className="contact-info-item">
                     <div className="contact-info-header">
                       <div className="icon-box">
-                        <Image src="/images/icon-phone.svg" alt="Phone Icon" width={40} height={40} />
+                        <Image src="/images/icon-phone.svg" alt="Phone Icon" width={40} height={40} quality={90} />
                       </div>
                       <div className="contact-info-title">
                         <h3>Connect now</h3>
@@ -74,12 +79,12 @@ export default function Contact() {
                         <a href="tel:987456321">+(987)456-321</a>
                       </p>
                     </div>
-                  </div>
+                  </RevealItem>
 
-                  <div className="contact-info-item">
+                  <RevealItem className="contact-info-item">
                     <div className="contact-info-header">
                       <div className="icon-box">
-                        <Image src="/images/icon-mail.svg" alt="Mail Icon" width={40} height={40} />
+                        <Image src="/images/icon-mail.svg" alt="Mail Icon" width={40} height={40} quality={90} />
                       </div>
                       <div className="contact-info-title">
                         <h3>Email us</h3>
@@ -92,17 +97,14 @@ export default function Contact() {
                         </a>
                       </p>
                     </div>
-                  </div>
+                  </RevealItem>
                 </div>
 
-                <div
-                  className="location-info-list wow fadeInUp"
-                  data-wow-delay="0.6s"
-                >
-                  <div className="contact-info-item">
+                <div className="location-info-list wow fadeInUp" data-wow-delay="0.6s">
+                  <RevealItem className="contact-info-item">
                     <div className="contact-info-header">
                       <div className="icon-box">
-                        <Image src="/images/icon-location.svg" alt="Location Icon" width={40} height={40} />
+                        <Image src="/images/icon-location.svg" alt="Location Icon" width={40} height={40} quality={90} />
                       </div>
                       <div className="contact-info-title">
                         <h3>Visit our Factory</h3>
@@ -111,12 +113,12 @@ export default function Contact() {
                     <div className="contact-info-body">
                       <p>Perinthalmanna, Kerala 679322</p>
                     </div>
-                  </div>
+                  </RevealItem>
 
-                  <div className="contact-info-item">
+                  <RevealItem className="contact-info-item">
                     <div className="contact-info-header">
                       <div className="icon-box">
-                        <Image src="/images/icon-clock.svg" alt="Clock Icon" width={40} height={40} />
+                        <Image src="/images/icon-clock.svg" alt="Clock Icon" width={40} height={40} quality={90} />
                       </div>
                       <div className="contact-info-title">
                         <h3>Working hour</h3>
@@ -126,13 +128,13 @@ export default function Contact() {
                       <p>Mon to Sat : 8:00 AM - 8:00 PM</p>
                       <p>Sunday : Closed</p>
                     </div>
-                  </div>
+                  </RevealItem>
                 </div>
               </div>
             </div>
 
             <div className="col-lg-6">
-              <div className="contact-us-form">
+              <RevealItem className="contact-us-form">
                 <div className="section-title">
                   <h2 className="text-anime-style-2" data-cursor="-opaque">
                     Contact <span>us</span>
@@ -140,6 +142,7 @@ export default function Contact() {
                 </div>
 
                 <div className="contact-form">
+                  {/* content inside contact form */}
                   <form
                     id="contactForm"
                     action="#"
@@ -149,65 +152,26 @@ export default function Contact() {
                     data-wow-delay="0.2s"
                   >
                     <div className="row">
-                      <div className="form-group col-md-6 mb-4">
-                        <input
-                          type="text"
-                          name="fname"
-                          className="form-control"
-                          id="fname"
-                          placeholder="First name"
-                          required
-                        />
+                       <div className="form-group col-md-6 mb-4">
+                        <input type="text" name="fname" className="form-control" id="fname" placeholder="First name" required />
                         <div className="help-block with-errors"></div>
                       </div>
-
                       <div className="form-group col-md-6 mb-4">
-                        <input
-                          type="text"
-                          name="lname"
-                          className="form-control"
-                          id="lname"
-                          placeholder="Last name"
-                          required
-                        />
+                        <input type="text" name="lname" className="form-control" id="lname" placeholder="Last name" required />
                         <div className="help-block with-errors"></div>
                       </div>
-
                       <div className="form-group col-md-6 mb-4">
-                        <input
-                          type="email"
-                          name="email"
-                          className="form-control"
-                          id="email"
-                          placeholder="E-mail"
-                          required
-                        />
+                        <input type="email" name="email" className="form-control" id="email" placeholder="E-mail" required />
                         <div className="help-block with-errors"></div>
                       </div>
-
                       <div className="form-group col-md-6 mb-4">
-                        <input
-                          type="text"
-                          name="phone"
-                          className="form-control"
-                          id="phone"
-                          placeholder="Phone"
-                          required
-                        />
+                        <input type="text" name="phone" className="form-control" id="phone" placeholder="Phone" required />
                         <div className="help-block with-errors"></div>
                       </div>
-
                       <div className="form-group col-md-12 mb-5">
-                        <textarea
-                          name="message"
-                          className="form-control"
-                          id="message"
-                          rows="3"
-                          placeholder="Write Message..."
-                        ></textarea>
+                        <textarea name="message" className="form-control" id="message" rows="3" placeholder="Write Message..."></textarea>
                         <div className="help-block with-errors"></div>
                       </div>
-
                       <div className="col-md-12">
                         <button type="submit" className="btn-default">
                           <span>submit message</span>
@@ -217,17 +181,16 @@ export default function Contact() {
                     </div>
                   </form>
                 </div>
-              </div>
+              </RevealItem>
             </div>
           </div>
-        </div>
+        </RevealWrapper>
       </div>
-      {/* Page Contact Us End */}
 
       {/* Google Map Section Start */}
       <div className="google-map bg-section">
-        <div className="container-fluid">
-          <div className="row no-gutters">
+        <RevealWrapper className="container-fluid">
+          <RevealItem className="row no-gutters">
             <div className="col-lg-12">
               <div className="google-map-iframe">
                 <iframe
@@ -238,10 +201,9 @@ export default function Contact() {
                 ></iframe>
               </div>
             </div>
-          </div>
-        </div>
+          </RevealItem>
+        </RevealWrapper>
       </div>
-      {/* Google Map Section End */}
     </>
   );
 }

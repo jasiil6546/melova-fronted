@@ -147,11 +147,10 @@ export default function ProductDetailsClient({ product }) {
                     draggable={false}
                     src={img}
                     alt={`${product.title || product.name} image ${i + 1}`}
-                    width={1000}
-                    height={1000}
-                    quality={95}
-                    priority={i === 0}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+                    width={600}
+                    height={600}
+                    quality={90}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"  
                     style={{
                       width: "100%",
                       height: "auto",

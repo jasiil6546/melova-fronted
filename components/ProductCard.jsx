@@ -8,11 +8,10 @@ export default function ProductCard({ product, delay = "0.6s" }) {
       <div className="product-item wow fadeInUp" data-wow-delay={delay}>
         <div className="product-image relative h-64">
           <Image
-            src={product.image || "/placeholder.png"}
+            src={product.image || "/img/product-1.png"}
             alt={product.title || product.name || "Product Image"}
             fill
             quality={90}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
             className="object-cover"
           />
         </div>

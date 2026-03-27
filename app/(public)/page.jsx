@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { getProducts } from "@/lib/product-data";
 import ProductsScroll from "@/components/ProductsScroll";
+import { RevealWrapper, RevealItem } from "@/components/animations/RevealAnimation";
+import { ReverseParallax } from "@/components/animations/ReverseParallax";
 
 export default async function Home() {
   const products = await getProducts();
@@ -26,35 +28,39 @@ export default async function Home() {
                 {/* Video End */}
 
                 {/* Hero Content Start */}
-                <div className="hero-content dark-section">
+                <RevealWrapper className="hero-content dark-section">
                   {/* Section Title Start */}
                   <div className="section-title deep">
-                    <h1 className="text-anime-style-2" data-cursor="-opaque">
-                      Every piece of chocolate is <br />
-                      made fresh with love.
-                    </h1>
-                    <p
-                      className="wow fadeInUp"
-                      style={{ color: "#ffffffc2" }}
-                      data-wow-delay="0.2s"
-                    >
-                      Rich flavors, smooth textures, and artisanal care, crafted
-                      to make every mood sweeter and every memory richer.
-                    </p>
+                    <RevealItem>
+                      <h1 className="text-anime-style-2" data-cursor="-opaque">
+                        Every piece of chocolate is <br />
+                        made fresh with love.
+                      </h1>
+                    </RevealItem>
+                    <RevealItem>
+                      <p
+                        className="wow fadeInUp"
+                        style={{ color: "#ffffffc2" }}
+                        data-wow-delay="0.2s"
+                      >
+                        Rich flavors, smooth textures, and artisanal care, crafted
+                        to make every mood sweeter and every memory richer.
+                      </p>
+                    </RevealItem>
                   </div>
                   {/* Section Title End */}
 
                   {/* Hero Body Start */}
-                  <div className="hero-body wow fadeInUp" data-wow-delay="0.4s">
+                  <RevealItem className="hero-body wow fadeInUp" data-wow-delay="0.4s">
                     {/* Hero Button Start */}
                     <div className="hero-btn">
                       <Link href="/products" className="btn-default">
                         Explore More
                       </Link>
                     </div>
-                  </div>
+                  </RevealItem>
                   {/* Hero Body End */}
-                </div>
+                </RevealWrapper>
                 {/* Hero Content End */}
               </div>
               {/* Hero Box End */}
@@ -66,36 +72,42 @@ export default async function Home() {
 
       {/* Our Products Section Start */}
       <div className="our-products bg-section">
-        <div className="container">
+        <RevealWrapper className="container">
           <div className="row section-row">
             <div className="col-lg-12">
               <div className="section-title section-title-center">
-                <h3 className="wow fadeInUp">
-                  Here are some of our finest products.
-                </h3>
-                <h2 className="text-anime-style-2" data-cursor="-opaque">
-                  Melting Hearts, One Creation at a Time
-                </h2>
+                <RevealItem>
+                  <h3 className="wow fadeInUp">
+                    Here are some of our finest products.
+                  </h3>
+                </RevealItem>
+                <RevealItem>
+                  <h2 className="text-anime-style-2" data-cursor="-opaque">
+                    Melting Hearts, One Creation at a Time
+                  </h2>
+                </RevealItem>
               </div>
             </div>
           </div>
 
-          <ProductsScroll products={products} />
+          <RevealItem>
+            <ProductsScroll products={products} />
+          </RevealItem>
 
           {/* Footer Text */}
-          <div className="section-footer-text wow fadeInUp">
+          <RevealItem className="section-footer-text wow fadeInUp">
             <p>
               Taste the luxury of handcrafted cocoa delights –{" "}
               <Link href="/contact">order your chocolates today!</Link>
             </p>
-          </div>
-        </div>
+          </RevealItem>
+        </RevealWrapper>
       </div>
       {/* Our Products Section End */}
 
       {/* About Us Section Start */}
-      <div className="about-us project-cover">
-        <div className="container">
+      <ReverseParallax className="about-us project-cover" bgImage="/img/choco-land.png">
+        <RevealWrapper className="container">
           <div className="row align-items-center">
             <div className="col-lg-6">
               {/* About Us Content Start */}
@@ -108,28 +120,32 @@ export default async function Home() {
                 `}</style>
                 {/* Section Title Start */}
                 <div className="section-title about">
-                  <h3 className="wow fadeInUp">Melt in Bites</h3>
-                  <h2 className="text-anime-style-2" data-cursor="-opaque">
-                    Melova
-                    <br />
-                    Pistachio Kunafa
-                    <br />
-                    <span>
-                      Chocolate Bar <span>(200g)</span>
-                    </span>
-                  </h2>
+                  <RevealItem>
+                    <h3 className="wow fadeInUp">Melt in Bites</h3>
+                  </RevealItem>
+                  <RevealItem>
+                    <h2 className="text-anime-style-2" data-cursor="-opaque">
+                      Melova
+                      <br />
+                      Pistachio Kunafa
+                      <br />
+                      <span>
+                        Chocolate Bar <span>(200g)</span>
+                      </span>
+                    </h2>
+                  </RevealItem>
                 </div>
                 {/* Section Title End */}
 
                 {/* About Us Button Start */}
-                <div
+                <RevealItem
                   className="about-us-btn wow fadeInUp"
                   data-wow-delay="0.8s"
                 >
                   <Link href="/products" className="btn-default">
                     Discover
                   </Link>
-                </div>
+                </RevealItem>
                 {/* About Us Button End */}
               </div>
               {/* About Us Content End */}
@@ -139,36 +155,42 @@ export default async function Home() {
               {/* About Us Images Start */}
               <div className="about-us-images">
                 {/* About Image Start */}
-                <div className="about-image relative h-[500px]">
+                <RevealItem className="about-image relative h-[500px]">
                   <Image
                     src="/img/melova-11.png"
                     alt="Finest Chocolates"
-                    fill
-                    className="move-img object-contain"
+                    width={500}
+                    height={500}
+                    quality={90}
+                    className="move-img object-contain "
                   />
-                </div>
+                </RevealItem>
                 {/* About Image End */}
               </div>
               {/* About Us Images End */}
             </div>
           </div>
-        </div>
-      </div>
+        </RevealWrapper>
+      </ReverseParallax>
       {/* About Us Section End */}
 
       {/* Our Special Offers Section Start */}
       <div className="our-special-offers bg-section">
-        <div className="container">
+        <RevealWrapper className="container">
           <div className="row section-row">
             <div className="col-lg-12">
               {/* Section Title Start */}
               <div className="section-title section-title-center">
-                <h3 className="wow fadeInUp">
-                  Unwrap happiness with our seasonal delights
-                </h3>
-                <h2 className="text-anime-style-2" data-cursor="-opaque">
-                  Irresistible Chocolate Treats and Limited-Time Specials
-                </h2>
+                <RevealItem>
+                  <h3 className="wow fadeInUp">
+                    Unwrap happiness with our seasonal delights
+                  </h3>
+                </RevealItem>
+                <RevealItem>
+                  <h2 className="text-anime-style-2" data-cursor="-opaque">
+                    Irresistible Chocolate Treats and Limited-Time Specials
+                  </h2>
+                </RevealItem>
               </div>
               {/* Section Title End */}
             </div>
@@ -178,24 +200,24 @@ export default async function Home() {
             <div className="col-lg-4 col-md-6 order-1">
               {/* Offers Item List Start */}
               <div className="offers-item-list offer-list-1">
-                <div className="offer-item wow fadeInUp">
+                <RevealItem className="offer-item wow fadeInUp">
                   <div className="offer-image relative h-48 w-48 mx-auto">
-                    <Image src="/img/products/item-4.png" alt="Angel Chocolate Bars" fill className="object-contain" />
+                    <Image src="/img/products/item-4.png" alt="Angel Chocolate Bars" width={200} height={200} quality={90} className="object-cover" />
                   </div>
-                  <div className="offer-item-content">
+                  <div className="offer-item-content ml-8">
                     <h2>ANGEL CHOCOLATE BARS</h2>
                     <p>
                       Rich, velvety chocolate truffles with a melt-in-mouth
                       center.
                     </p>
                   </div>
-                </div>
+                </RevealItem>
 
-                <div className="offer-item wow fadeInUp" data-wow-delay="0.2s">
+                <RevealItem className="offer-item wow fadeInUp" data-wow-delay="0.2s">
                   <div className="offer-image relative h-48 w-48 mx-auto">
-                    <Image src="/img/products/item-5.png" alt="Pistachio Kunafa" fill className="object-contain" />
+                    <Image src="/img/products/item-5.png" alt="Pistachio Kunafa" width={200} height={200} quality={90} className="object-cover" />
                   </div>
-                  <div className="offer-item-content">
+                  <div className="offer-item-content ml-8">
                     <h2>
                       PISTACHIO
                       <br />
@@ -205,13 +227,13 @@ export default async function Home() {
                       Decadent dark chocolate blended with creamy cocoa fudge.
                     </p>
                   </div>
-                </div>
+                </RevealItem>
               </div>
               {/* Offers Item List End */}
             </div>
 
             <div className="col-lg-4 order-lg-2 order-md-3 order-2">
-              <div className="best-offer-image-box">
+              <RevealItem className="best-offer-image-box">
                 <div className="best-offer-content wow fadeInUp">
                   <h2>Best Offers</h2>
                   <p>Premium chocolate experiences at prices you’ll love!</p>
@@ -223,44 +245,44 @@ export default async function Home() {
                   className="best-offer-image wow fadeInUp"
                   data-wow-delay="0.2s"
                 >
-                  <figure className="relative h-80 w-full">
-                    <Image src="/img/offer.png" alt="Best Offers" fill className="object-contain" />
+                  <figure className="relative h-96 w-full">
+                    <Image src="/img/offer.png" alt="Best Offers" fill quality={90} className="!object-contain" />
                   </figure>
                 </div>
-              </div>
+              </RevealItem>
             </div>
 
             <div className="col-lg-4 col-md-6 order-lg-3 order-md-2 order-3">
               {/* Offers Item List Start */}
               <div className="offers-item-list offer-list-2">
-                <div className="offer-item wow fadeInUp">
+                <RevealItem className="offer-item wow fadeInUp">
                   <div className="offer-image relative h-48 w-48 mx-auto">
-                    <Image src="/img/products/item-7.png" alt="Melova Dates Chocolate" fill className="object-contain" />
+                    <Image src="/img/products/item-7.png" alt="Melova Dates Chocolate" width={200} height={200} quality={90} className="object-cover" />
                   </div>
-                  <div className="offer-item-content">
+                  <div className="offer-item-content ml-8">
                     <h2>MELOVA DATES CHOCOLATE</h2>
-                    <p>
+                    <p>       
                       Soft sponge cake with a gooey molten chocolate center.
                     </p>
                   </div>
-                </div>
+                </RevealItem>
 
-                <div className="offer-item wow fadeInUp" data-wow-delay="0.2s">
+                <RevealItem className="offer-item wow fadeInUp" data-wow-delay="0.2s">
                   <div className="offer-image relative h-48 w-48 mx-auto">
-                    <Image src="/img/products/item-8.png" alt="Melova Dates Chocolate Premium" fill className="object-contain" />
+                    <Image src="/img/products/item-8.png" alt="Melova Dates Chocolate Premium" width={200} height={200} quality={90} className="object-cover" />
                   </div>
-                  <div className="offer-item-content">
+                  <div className="offer-item-content ml-8">
                     <h2>MELOVA DATES CHOCOLATE</h2>
                     <p>
                       Crunchy roasted almonds dipped in smooth milk chocolate.
                     </p>
                   </div>
-                </div>
+                </RevealItem>
               </div>
               {/* Offers Item List End */}
             </div>
           </div>
-        </div>
+        </RevealWrapper>
       </div>
       {/* Our Special Offers Section End */}
 
@@ -272,13 +294,13 @@ export default async function Home() {
             "var(--accent-color) url('/img/banner.png') center/cover no-repeat",
         }}
       >
-        <div className="container">
+        <RevealWrapper className="container">
           <div className="row service-item-list">
             <div className="col-lg-12">
               <div className="about-us-item-list">
-                <div className="about-us-item wow fadeInUp">
+                <RevealItem className="about-us-item wow fadeInUp">
                   <div className="icon-box">
-                    <Image src="/images/icon-about-us-item-1.svg" alt="Precision Icon" width={60} height={60} />
+                    <Image src="/images/icon-about-us-item-1.svg" alt="Precision Icon" width={60} height={60} quality={90} />
                   </div>
                   <div className="about-us-item-content">
                     <h3>Precision-Crafted Chocolates</h3>
@@ -287,14 +309,14 @@ export default async function Home() {
                       texture.
                     </p>
                   </div>
-                </div>
+                </RevealItem>
 
-                <div
+                <RevealItem
                   className="about-us-item wow fadeInUp"
                   data-wow-delay="0.2s"
                 >
                   <div className="icon-box">
-                    <Image src="/images/icon-about-us-item-2.svg" alt="Eco Packaging Icon" width={60} height={60} />
+                    <Image src="/images/icon-about-us-item-2.svg" alt="Eco Packaging Icon" width={60} height={60} quality={90} />
                   </div>
                   <div className="about-us-item-content">
                     <h3>Eco-Friendly Packaging</h3>
@@ -303,14 +325,14 @@ export default async function Home() {
                       the planet.
                     </p>
                   </div>
-                </div>
+                </RevealItem>
 
-                <div
+                <RevealItem
                   className="about-us-item wow fadeInUp"
                   data-wow-delay="0.4s"
                 >
                   <div className="icon-box">
-                    <Image src="/images/icon-about-us-item-3.svg" alt="Freshness Icon" width={60} height={60} />
+                    <Image src="/images/icon-about-us-item-3.svg" alt="Freshness Icon" width={60} height={60} quality={90} />
                   </div>
                   <div className="about-us-item-content">
                     <h3>Guaranteed Freshness</h3>
@@ -318,35 +340,39 @@ export default async function Home() {
                       Chocolates made daily to ensure peak taste and quality.
                     </p>
                   </div>
-                </div>
+                </RevealItem>
               </div>
             </div>
           </div>
-        </div>
+        </RevealWrapper>
       </div>
       {/* Our Services Section End */}
 
       {/* Our Blog Section Start */}
       <div className="our-blog bg-section">
-        <div className="container">
+        <RevealWrapper className="container">
           <div className="row section-row">
             <div className="col-lg-12">
               <div className="section-title section-title-center">
-                <h3 className="wow fadeInUp">Latest blog</h3>
-                <h2 className="text-anime-style-2" data-cursor="-opaque">
-                  Bite-Sized Stories: Discover, Learn, and Explore
-                </h2>
+                <RevealItem>
+                  <h3 className="wow fadeInUp">Latest blog</h3>
+                </RevealItem>
+                <RevealItem>
+                  <h2 className="text-anime-style-2" data-cursor="-opaque">
+                    Bite-Sized Stories: Discover, Learn, and Explore
+                  </h2>
+                </RevealItem>
               </div>
             </div>
           </div>
 
           <div className="row">
             <div className="col-lg-4 col-md-6">
-              <div className="post-item wow fadeInUp">
+              <RevealItem className="post-item wow fadeInUp">
                 <div className="post-featured-image">
                   <Link href="/work-of-art" data-cursor-text="View">
                     <figure className="image-anime relative h-64">
-                      <Image src="/img/post-1.jpg" alt="Melova Chocolate Art" fill className="object-cover" />
+                      <Image src="/img/post-1.jpg" alt="Melova Chocolate Art" fill quality={90} className="object-cover" />
                     </figure>
                   </Link>
                 </div>
@@ -362,15 +388,15 @@ export default async function Home() {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </RevealItem>
             </div>
 
             <div className="col-lg-4 col-md-6">
-              <div className="post-item wow fadeInUp">
+              <RevealItem className="post-item wow fadeInUp">
                 <div className="post-featured-image">
                   <Link href="/luxury-in-every-bite" data-cursor-text="View">
                     <figure className="image-anime relative h-64">
-                      <Image src="/img/post-2.jpg" alt="Luxury Melova Chocolate" fill className="object-cover" />
+                      <Image src="/img/post-2.jpg" alt="Luxury Melova Chocolate" fill quality={90} className="object-cover" />
                     </figure>
                   </Link>
                 </div>
@@ -388,15 +414,15 @@ export default async function Home() {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </RevealItem>
             </div>
 
             <div className="col-lg-4 col-md-6">
-              <div className="post-item wow fadeInUp">
+              <RevealItem className="post-item wow fadeInUp">
                 <div className="post-featured-image">
                   <Link href="/the-melova-story" data-cursor-text="View">
                     <figure className="image-anime relative h-64">
-                      <Image src="/img/post-3.jpg" alt="The Melova Story" fill className="object-cover" />
+                      <Image src="/img/post-3.jpg" alt="The Melova Story" fill quality={90} className="object-cover" />
                     </figure>
                   </Link>
                 </div>
@@ -414,10 +440,10 @@ export default async function Home() {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </RevealItem>
             </div>
           </div>
-        </div>
+        </RevealWrapper>
       </div>
       {/* Our Blog Section End */}
     </>

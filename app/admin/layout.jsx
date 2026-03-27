@@ -35,6 +35,7 @@ export default function AdminLayout({ children }) {
                 alt="MyMelova Admin"
                 width={120}
                 height={40}
+                quality={90}
                 style={{ maxWidth: "120px", height: "auto" }}
                 priority
               />

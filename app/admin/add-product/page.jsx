@@ -105,7 +105,35 @@ const addVariant = () => {
     return URL.createObjectURL(img);
   };
 
-  // Token refresh and absolute URLs are now handled automatically by the api instance in @/lib/axios
+  // Function to refresh the token using your existing refresh token
+  const refreshAccessToken = async () => {
+    const refreshToken = localStorage.getItem("melova_refresh");
+
+    if (!refreshToken) {
+      return null;
+    }
+
+    try {
+      const response = await axios.post(
+        `${API_URL}api/token/refresh/`,
+        { refresh: refreshToken }
+      );
+
+      const newAccessToken = response.data.access;
+
+      // Update token in localStorage and axios headers
+      localStorage.setItem("melova_token", newAccessToken);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
+
+      return newAccessToken;
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      // If refresh fails, logout the user
+      logout();
+      router.push('/admin/login?redirect=/admin/products/add');
+      return null;
+    }
+  };
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -167,7 +195,7 @@ const handleSubmit = async (e) => {
     }
     
     // Get the current token
-    let currentToken = sessionStorage.getItem("melova_token");
+    let currentToken = localStorage.getItem("melova_token");
     console.log('Using token:', currentToken ? 'Token exists' : 'No token');
     
     // Make the request using shared api instance for auto-refresh
@@ -548,24 +576,16 @@ const handleSubmit = async (e) => {
                         {variant.images.map((imgUrl, imgIndex) => (
                           <div className="col-lg-6" key={imgIndex}>
                             <div className="variant-image-input-group">
-                              <a 
-                                href={getImagePreview(imgUrl)} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="leading-none"
-                              >
-                                <Image
-                                  src={getImagePreview(imgUrl) || "https://placehold.co/100x100?text=No+Image"}
-                                  className="variant-image-preview shadow-sm hover:opacity-80 transition-opacity"
-                                  alt="Preview"
-                                  width={100}
-                                  height={100}
-                                  quality={95}
-                                  unoptimized={typeof imgUrl !== "string"}
-                                  onError={(e) => (e.target.src = "https://placehold.co/100x100?text=No+Image")}
-                                  style={{ cursor: 'zoom-in' }}
-                                />
-                              </a>
+                              <Image
+                                src={getImagePreview(imgUrl) || "https://placehold.co/100x100?text=No+Image"}
+                                className="variant-image-preview"
+                                alt="Preview"
+                                width={50}
+                                height={50}
+                                quality={90}
+                                unoptimized
+                                onError={(e) => (e.target.src = "https://placehold.co/100x100?text=No+Image")}
+                              />
                               <input
                                 type="file"
                                 accept="image/*"

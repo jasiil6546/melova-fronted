@@ -88,6 +88,7 @@ export default function Header() {
                   alt="Melova Logo"
                   width={150}
                   height={56}
+                  quality={90}
                   className={`transition-all duration-300 w-auto drop-shadow-lg ${!isAnimatedPage || scrolled ? "h-12" : "h-14"
                     }`}
                   priority
@@ -270,6 +271,7 @@ export default function Header() {
             alt="Melova Logo"
             width={120}
             height={40}
+            quality={90}
             className="h-10 w-auto"
           />
           <button

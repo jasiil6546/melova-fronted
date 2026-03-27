@@ -236,7 +236,7 @@ export default function AdminProducts() {
                             alt={product.title || "product image"}
                             fill
                             quality={90}
-                            className="object-contain"
+                            className="object-cover"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-1 font-medium bg-gray-100">

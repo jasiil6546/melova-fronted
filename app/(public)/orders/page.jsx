@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import api from "@/lib/axios";
+import axios from "axios";
+import { RevealWrapper, RevealItem } from "@/components/animations/RevealAnimation";
 
 export default function MyOrdersPage() {
   const { token, user } = useAuth();
@@ -73,18 +74,20 @@ export default function MyOrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 px-4 py-8 sm:px-6 sm:py-12 mt-16 font-sans">
+    <RevealWrapper className="min-h-screen bg-stone-50 px-4 py-8 sm:px-6 sm:py-12 mt-16 font-sans">
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight flex items-center gap-3">
-            <i className="fas fa-shopping-bag text-[#9e7c29]"></i>
-            My Orders
-          </h1>
+          <RevealItem>
+            <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight flex items-center gap-3">
+              <i className="fas fa-shopping-bag text-[#9e7c29]"></i>
+              My Orders
+            </h1>
+          </RevealItem>
         </div>
 
         <div className="space-y-6">
           {orders.map((order) => (
-            <div
+            <RevealItem
               key={order.id}
               className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden hover:border-[#9e7c29]/30 transition-colors"
             >
@@ -170,10 +173,10 @@ export default function MyOrdersPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </RevealItem>
           ))}
         </div>
       </div>
-    </div>
+    </RevealWrapper>
   );
 }

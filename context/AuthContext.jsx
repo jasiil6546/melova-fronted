@@ -7,27 +7,27 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     if (typeof window !== "undefined") {
-      const savedUser = sessionStorage.getItem("melova_user");
+      const savedUser = localStorage.getItem("melova_user");
       return savedUser ? JSON.parse(savedUser) : null;
     }
     return null;
   });
   const [role, setRole] = useState(() => {
     if (typeof window !== "undefined") {
-      return sessionStorage.getItem("melova_role");
+      return localStorage.getItem("melova_role");
     }
     return null;
   });
   const [token, setToken] = useState(() => {
     if (typeof window !== "undefined") {
-      return sessionStorage.getItem("melova_token");
+      return localStorage.getItem("melova_token");
     }
     return null;
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Auth state is already loaded from sessionStorage via lazy init above.
+    // Auth state is already loaded from localStorage via lazy init above.
     // Mark loading as complete so guards can render.
     setLoading(false);
   }, []);
@@ -49,10 +49,10 @@ export function AuthProvider({ children }) {
     setRole(userRole);
     setUser(user);
 
-    sessionStorage.setItem("melova_token", accessToken);
-    if (refresh) sessionStorage.setItem("melova_refresh", refresh);
-    sessionStorage.setItem("melova_role", userRole);
-    sessionStorage.setItem("melova_user", JSON.stringify(user));
+    localStorage.setItem("melova_token", accessToken);
+    if (refresh) localStorage.setItem("melova_refresh", refresh);
+    localStorage.setItem("melova_role", userRole);
+    localStorage.setItem("melova_user", JSON.stringify(user));
 
     return userRole;
   };
@@ -92,12 +92,12 @@ export function AuthProvider({ children }) {
     // wrapped in { user: ... } only when using retrieve.
     const updatedUser = res.data.user || res.data;
     setUser(updatedUser);
-    sessionStorage.setItem("melova_user", JSON.stringify(updatedUser));
+    localStorage.setItem("melova_user", JSON.stringify(updatedUser));
     return updatedUser;
   };
 
   const logout = async () => {
-    const refreshToken = sessionStorage.getItem("melova_refresh");
+    const refreshToken = localStorage.getItem("melova_refresh");
 
     if (refreshToken) {
       try {
@@ -110,10 +110,10 @@ export function AuthProvider({ children }) {
     setToken(null);
     setRole(null);
     setUser(null);
-    sessionStorage.removeItem("melova_token");
-    sessionStorage.removeItem("melova_refresh");
-    sessionStorage.removeItem("melova_role");
-    sessionStorage.removeItem("melova_user");
+    localStorage.removeItem("melova_token");
+    localStorage.removeItem("melova_refresh");
+    localStorage.removeItem("melova_role");
+    localStorage.removeItem("melova_user");
   };
 
   return (

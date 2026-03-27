@@ -41,8 +41,6 @@ export default function AdminEditProduct() {
             introduction: data.introduction || "",
             details: data.details || ""
           });
-          setProductImage(data.image || null);
-          
           // Map backend variants to our frontend state
           const mappedVariants = (data.variants || []).map((v) => ({
             id: v.id,
@@ -57,13 +55,13 @@ export default function AdminEditProduct() {
             }), 
             backendId: v.id
           }));
-          
+
           if (mappedVariants.length === 0) {
             mappedVariants.push({ id: Date.now(), name: "", gram: "", price: "", isPrimary: true, images: [] });
           } else {
             mappedVariants[0].isPrimary = true;
           }
-          
+
           setVariants(mappedVariants);
         } else {
           setError("Product not found");
@@ -159,10 +157,25 @@ export default function AdminEditProduct() {
   const getImagePreview = (img) => {
     if (!img) return null;
     if (typeof img === "string") return img;
+    return URL.createObjectURL(img);
+  };
+
+  const refreshAccessToken = async () => {
+    const refreshToken = localStorage.getItem("melova_refresh");
+    if (!refreshToken) return null;
     try {
-        return URL.createObjectURL(img);
-    } catch (e) {
-        return null;
+      const response = await axios.post(
+        `${API_URL}api/token/refresh/`,
+        { refresh: refreshToken }
+      );
+      const newAccessToken = response.data.access;
+      localStorage.setItem("melova_token", newAccessToken);
+      return newAccessToken;
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      logout();
+      router.push(`/admin/login?redirect=/admin/edit-product/${id}`);
+      return null;
     }
   };
 
@@ -170,29 +183,26 @@ export default function AdminEditProduct() {
     e.preventDefault();
     setSaving(true);
     setError(null);
-    
+
     try {
-      // SUCCESS: Minimal worked! Now let's try the full update with PATCH to be safer.
-      const fullFormData = new FormData();
-      fullFormData.append('title', productData.title);
-      fullFormData.append('price', String(productData.price));
-      fullFormData.append('introduction', productData.introduction || "");
-      fullFormData.append('details', productData.details || "");
-      
-      if (productImage instanceof File) {
-        fullFormData.append('image', productImage);
-      }
-      
+      const formData = new FormData();
+      formData.append('title', productData.title);
+      formData.append('introduction', productData.introduction);
+      formData.append('details', productData.details);
+      formData.append('price', productData.price);
+
       variants.forEach((variant, index) => {
         const variantName = variant.name || `${variant.gram || '0'}g`;
+        formData.append(`variants[${index}][name]`, variantName);
+        formData.append(`variants[${index}][weight]`, variant.gram || '0');
+        formData.append(`variants[${index}][price]`, variant.price || '0');
+
         if (variant.backendId) {
-          fullFormData.append(`variants[${index}][id]`, String(variant.backendId));
+          formData.append(`variants[${index}][id]`, variant.backendId);
         }
-        fullFormData.append(`variants[${index}][name]`, String(variantName));
-        fullFormData.append(`variants[${index}][weight]`, String(variant.gram || '0'));
-        fullFormData.append(`variants[${index}][price]`, String(variant.price || '0'));
-        
-        // Handle only NEW images
+
+
+        // Handle images
         if (variant.images) {
           variant.images.forEach((img) => {
             if (img instanceof File) {
@@ -201,10 +211,30 @@ export default function AdminEditProduct() {
           });
         }
       });
-      
-      console.log('Final Attempt with PATCH...');
-      
-      const response = await api.patch(`/api/shop/products/${id}/`, fullFormData);
+
+      let currentToken = localStorage.getItem("melova_token");
+
+      let response = await fetch(`${API_URL}api/shop/products/${id}/`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${currentToken}` },
+        body: formData,
+      });
+
+      if (response.status === 401) {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          response = await fetch(`${API_URL}api/shop/products/${id}/`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${newToken}` },
+            body: formData,
+          });
+        }
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
+      }
 
       router.push('/admin/products');
     } catch (err) {
@@ -315,7 +345,7 @@ export default function AdminEditProduct() {
                     type="text"
                     className="form-control"
                     value={productData.title}
-                    onChange={(e) => setProductData({...productData, title: e.target.value})}
+                    onChange={(e) => setProductData({ ...productData, title: e.target.value })}
                     required
                   />
                 </div>
@@ -328,7 +358,7 @@ export default function AdminEditProduct() {
                     step="0.01"
                     className="form-control"
                     value={productData.price}
-                    onChange={(e) => setProductData({...productData, price: e.target.value})}
+                    onChange={(e) => setProductData({ ...productData, price: e.target.value })}
                     required
                   />
                 </div>
@@ -340,7 +370,7 @@ export default function AdminEditProduct() {
                 className="form-control"
                 rows="2"
                 value={productData.introduction}
-                onChange={(e) => setProductData({...productData, introduction: e.target.value})}
+                onChange={(e) => setProductData({ ...productData, introduction: e.target.value })}
                 required
               ></textarea>
             </div>
@@ -350,7 +380,7 @@ export default function AdminEditProduct() {
                 className="form-control"
                 rows="6"
                 value={productData.details}
-                onChange={(e) => setProductData({...productData, details: e.target.value})}
+                onChange={(e) => setProductData({ ...productData, details: e.target.value })}
                 required
               ></textarea>
             </div>
@@ -424,24 +454,15 @@ export default function AdminEditProduct() {
                     {variant.images.map((img, i) => (
                       <div className="col-lg-6" key={i}>
                         <div className="variant-image-input-group">
-                          <a 
-                            href={getImagePreview(img)} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="leading-none"
-                          >
-                            <Image
-                              src={getImagePreview(img) || "https://placehold.co/100x100?text=No+Image"}
-                              className="variant-image-preview shadow-sm hover:opacity-80 transition-opacity"
-                              alt="Product Preview"
-                              width={100}
-                              height={100}
-                              quality={95}
-                              unoptimized={typeof img !== "string"}
-                              style={{ cursor: 'zoom-in' }}
-                              onError={(e) => (e.target.src = "https://placehold.co/100x100?text=No+Image")}
-                            />
-                          </a>
+                          <Image
+                            src={getImagePreview(img) || "https://placehold.co/100x100?text=No+Image"}
+                            className="variant-image-preview"
+                            alt="Product Preview"
+                            width={50}
+                            height={50}
+                            quality={90}
+                            unoptimized
+                          />
                           <input type="file" accept="image/*" className="form-control form-control-sm" onChange={(e) => {
                             const file = e.target.files[0];
                             if (file) updateImage(variant.id, i, file);

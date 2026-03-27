@@ -28,6 +28,7 @@ export default function Footer() {
               alt="Melova Logo"
               width={200}
               height={64}
+              quality={90}
               className="h-16 w-auto drop-shadow-lg"
             />
           </div>

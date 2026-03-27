@@ -173,6 +173,7 @@ export default function AdminOrderDetails() {
                       }
                       alt={item.product_name}
                       fill
+                      quality={90}
                       className="object-cover group-hover:scale-110 transition duration-500"
                     />
                   </div>

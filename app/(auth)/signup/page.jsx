@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "../../../context/AuthContext";
+import GoogleLoginButton from "../../../components/GoogleLoginButton";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -18,9 +19,8 @@ export default function Signup() {
   const [passwordStrength, setPasswordStrength] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
 
-  const { user, register, loginWithGoogle, loading: authLoading } = useAuth();
+  const { user, register, loading: authLoading } = useAuth();
   const router = useRouter();
 
   React.useEffect(() => {
@@ -78,32 +78,7 @@ const handleSubmit = async (e) => {
   }
 };
 
-  const handleGoogleCredential = React.useCallback(async (credential) => {
-    setError("");
-    setGoogleLoading(true);
-    try {
-      const role = await loginWithGoogle(credential);
-      router.push(role === "admin" ? "/admin" : "/");
-    } catch (err) {
-      setError(err.response?.data?.error || "Google sign-in failed.");
-    } finally {
-      setGoogleLoading(false);
-    }
-  }, [loginWithGoogle, router]);
 
-  React.useEffect(() => {
-    if (!window.google || !process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) return;
-    try {
-      window.google.accounts.id.initialize({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        callback: (response) => {
-          if (response.credential) handleGoogleCredential(response.credential);
-        },
-      });
-    } catch (e) {
-      console.error("Failed to initialize Google Identity Services", e);
-    }
-  }, [handleGoogleCredential]);
 
   const strengthBar = {
     weak: "w-1/3 bg-red-400",
@@ -125,6 +100,7 @@ const handleSubmit = async (e) => {
               alt="MyMelova"
               width={64}
               height={64}
+              quality={90}
               className="w-16 mx-auto mb-4"
               priority
             />
@@ -273,55 +249,7 @@ const handleSubmit = async (e) => {
           </div>
 
           {/* Google */}
-          <button
-            type="button"
-            disabled={googleLoading}
-            onClick={() => {
-              if (window.google && process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
-                window.google.accounts.id.prompt();
-              } else {
-                setError("Google Sign-In is not configured.");
-              }
-            }}
-            className="w-full flex items-center justify-center gap-2.5 rounded-lg border border-gray-200 bg-white py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {googleLoading ? (
-              <>
-                <svg
-                  className="h-4 w-4 animate-spin text-gray-400"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  />
-                </svg>
-                Signing up…
-              </>
-            ) : (
-              <>
-                <Image
-                  src="https://developers.google.com/identity/images/g-logo.png"
-                  alt="Google"
-                  width={16}
-                  height={16}
-                  className="h-4 w-4"
-                />
-                Continue with Google
-              </>
-            )}
-          </button>
-          <div id="googleSignUpButton" className="hidden" />
+          <GoogleLoginButton onError={setError} text="signup_with" />
 
           {/* Footer links */}
           <p className="mt-6 text-center text-sm text-gray-400">

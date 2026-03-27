@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import AuthGuard from "@/components/AuthGuard";          
+import AuthGuard from "@/components/AuthGuard";
+import { RevealWrapper, RevealItem } from "@/components/animations/RevealAnimation";
 
 export default function ProfilePage() {
   const { user, logout, updateProfile } = useAuth();
@@ -54,7 +55,7 @@ export default function ProfilePage() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-stone-50 py-20 px-4 sm:px-6 lg:px-8">
+      <RevealWrapper className="min-h-screen bg-stone-50 py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           {/* Breadcrumbs */}
           <nav className="flex mb-8 text-sm" aria-label="Breadcrumb">
@@ -88,7 +89,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <div className="bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
+          <RevealItem className="bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
             {/* Profile Header Background */}
             <div className="h-32 bg-gradient-to-r from-amber-100 to-amber-200"></div>
 
@@ -277,19 +278,21 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
-          </div>
+          </RevealItem>
 
-          <p className="text-center text-stone-400 text-sm mt-8">
-            Need help?{" "}
+          <RevealItem>
+            <p className="text-center text-stone-400 text-sm mt-8">
+              Need help?{" "}
             <Link
               href="/contact"
               className="text-amber-800 font-medium hover:underline"
             >
               Contact Support
             </Link>
-          </p>
+            </p>
+          </RevealItem>
         </div>
-      </div>
+      </RevealWrapper>
     </AuthGuard>
   );
 }

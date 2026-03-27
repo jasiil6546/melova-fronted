@@ -431,7 +431,6 @@ a:focus {
 	font-family: var(--accent-font);
 	font-size: 18px;
 	font-weight: 400;
-	font-style: italic;
 	color: var(--accent-color);
 	background-image: url('/images/icon-sparkle-accent.svg');
 	background-repeat: no-repeat;
@@ -480,7 +479,7 @@ a:focus {
 }
 
 .about-us {
-	background: url('/img/choco-land.png') no-repeat center/cover;
+	background: transparent;
 }
 
 .dark-section .section-title h3 {
@@ -2224,7 +2223,7 @@ header.main-header .header-sticky.active {
 
 .offer-item-content h2 {
 	font-size: 24px;
-	font-family: "Anton", sans-serif;
+
 }
 
 
@@ -7245,7 +7244,6 @@ header.main-header .header-sticky.active {
 }
 
 .about-us H2 {
-	font-family: poppins;
 	font-weight: 600;
 	font-size: 70px;
 	text-transform: capitalize;
