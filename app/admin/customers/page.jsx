@@ -17,7 +17,7 @@ export default function AdminCustomers() {
     async function fetchCustomers() {
       if (!token) return;
       try {
-        const response = await api.get("api/auth/customers/");
+        const response = await api.get(`/api/auth/customers/`);
         const data = response.data;
         const customersArray = Array.isArray(data) ? data : data.results || [];
         setCustomers(customersArray);
@@ -29,7 +29,7 @@ export default function AdminCustomers() {
       }
     }
     fetchCustomers();
-  }, [token, API_URL]);
+  }, [token]);
 
 
   useEffect(() => {

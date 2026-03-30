@@ -23,12 +23,10 @@ export default function AdminDashboard() {
     async function fetchData() {
       if (!token) return;
       
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
-      
       try {
         const [ordersRes, productsRes] = await Promise.all([
-          api.get("api/shop/orders/"),
-          api.get("api/shop/products/"),
+          api.get(`/api/shop/orders/`),
+          api.get(`/api/shop/products/`),
         ]);
 
         const ordersData = ordersRes.data;

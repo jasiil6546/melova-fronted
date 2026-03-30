@@ -11,14 +11,13 @@ export default function AdminOrders() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
   const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     async function fetchOrders() {
       if (!token) return;
       try {
-        const response = await api.get("api/shop/orders/");
+        const response = await api.get(`/api/shop/orders/`);
         const data = response.data;
         const ordersArray = Array.isArray(data) ? data : data.results || [];
         setOrders(ordersArray);
@@ -30,7 +29,7 @@ export default function AdminOrders() {
       }
     }
     fetchOrders();
-  }, [token, API_URL]);
+  }, [token]);
 
   useEffect(() => {
     const filtered = orders.filter((order) => {
@@ -80,14 +79,18 @@ export default function AdminOrders() {
   if (!confirmDelete) return;
 
   try {
-    await api.delete(`api/shop/orders/${id}/`);
+    const response = await api.delete(`/api/shop/orders/${id}/`);
 
+    if (response.status === 204 || (response.status >= 200 && response.status < 300)) {
     // Remove deleted order from state (instant UI update)
     const updatedOrders = orders.filter((order) => order.id !== id);
     setOrders(updatedOrders);
     setFilteredOrders(updatedOrders);
 
     alert("Order deleted successfully");
+    } else {
+        throw new Error("Failed to delete");
+    }
   } catch (error) {
     console.error("Delete error:", error);
     alert("Failed to delete order");

@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import axios from "axios";
 import api from "@/lib/axios";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useParams } from "next/navigation";
@@ -24,6 +23,7 @@ export default function AdminEditProduct() {
     introduction: "",
     details: ""
   });
+  const [productImage, setProductImage] = useState(null);
 
   const [variants, setVariants] = useState([]);
 
@@ -41,26 +41,23 @@ export default function AdminEditProduct() {
             introduction: data.introduction || "",
             details: data.details || ""
           });
-
           // Map backend variants to our frontend state
-          const mappedVariants = (data.variants || []).map((v) => {
-            const variantImages = (v.images || []).map(imgObj => imgObj.image || imgObj);
-            // Ensure at least one image slot to keep the UI input visible
-            const imagesToShow = variantImages.length > 0 ? variantImages : [""];
-            
-            return {
-              id: v.id,
-              name: v.name || "",
-              gram: v.weight ?? v.gram ?? "",
-              price: v.price ?? "",
-              isPrimary: false,
-              images: imagesToShow,
-              backendId: v.id
-            };
-          });
+          const mappedVariants = (data.variants || []).map((v) => ({
+            id: v.id,
+            name: v.name || "",
+            gram: v.weight || v.gram || "",
+            price: v.price || "",
+            isPrimary: false,
+            // Store image objects/strings as they come
+            images: (v.images || []).map(imgObj => {
+                if (typeof imgObj === 'string') return imgObj;
+                return imgObj.image || imgObj;
+            }), 
+            backendId: v.id
+          }));
 
           if (mappedVariants.length === 0) {
-            mappedVariants.push({ id: Date.now(), name: "", gram: "", price: "", isPrimary: true, images: [""] });
+            mappedVariants.push({ id: Date.now(), name: "", gram: "", price: "", isPrimary: true, images: [] });
           } else {
             // Determine primary variant (one with lowest price or just first)
             mappedVariants[0].isPrimary = true;
@@ -98,7 +95,7 @@ export default function AdminEditProduct() {
         gram: "",
         price: "",
         isPrimary: false,
-        images: [""],
+        images: [],
       },
     ]);
   };
@@ -190,17 +187,10 @@ export default function AdminEditProduct() {
 
         // Handle images
         if (variant.images) {
-          variant.images.forEach((file) => {
-            if (file instanceof File) {
-              formData.append(`variants[${index}][images]`, file);
+          variant.images.forEach((img) => {
+            if (img instanceof File) {
+               fullFormData.append(`variants[${index}][images]`, img);
             }
-            // For existing images (strings), we might not append them 
-            // the backend update logic says it deletes all then re-adds.
-            // This means we might need to re-upload or the backend needs to handle URLs.
-            // Given the serializer logic, it only processes `hasattr(f, 'read')`, 
-            // which means it ONLY re-adds uploaded files.
-            // IMPORTANT: This means existing images NOT re-uploaded will be lost.
-            // For now, I'll follow this, but in a real app, you'd want to handle "kept" images.
           });
         }
       });
@@ -211,8 +201,17 @@ export default function AdminEditProduct() {
       console.log('Update success:', res.data);
       router.push('/admin/products');
     } catch (err) {
-      console.error('Update error details:', err.response?.data || err);
-      setError(err.response?.data?.message || err.response?.data?.detail || err.message || 'Failed to update product');
+      console.error('Final Patch Error:', err);
+      let detail = 'Server rejected request';
+      if (err.response) {
+        detail = typeof err.response.data === 'string' 
+          ? err.response.data 
+          : JSON.stringify(err.response.data);
+      } else {
+        detail = err.message;
+      }
+        
+      setError(`Update Failed (500): ${detail.substring(0, 400)}`);
     } finally {
       setSaving(false);
     }
@@ -268,7 +267,41 @@ export default function AdminEditProduct() {
           <div className="card-header"><h2>General Information</h2></div>
           <div className="card-body p-4 p-md-5">
             <div className="row g-4">
-              <div className="col-md-9">
+              <div className="col-md-3">
+                <label className="form-label">Featured Product Image</label>
+                <div 
+                  className="border-2 border-dashed rounded-xl p-3 text-center cursor-pointer hover:bg-stone-50 transition-all border-stone-200"
+                  onClick={() => document.getElementById('mainImageInput').click()}
+                >
+                  {productImage ? (
+                    <div className="position-relative">
+                      <Image
+                        src={getImagePreview(productImage)}
+                        alt="Main Preview"
+                        width={240}
+                        height={240}
+                        className="rounded-lg object-fit-cover mx-auto shadow-md"
+                        style={{ height: '180px', width: '180px' }}
+                        unoptimized={productImage instanceof File}
+                      />
+                      <p className="mt-2 text-xs text-stone-500">Click to change</p>
+                    </div>
+                  ) : (
+                    <div className="py-4">
+                      <i className="fas fa-cloud-upload-alt text-3xl text-stone-300 mb-2"></i>
+                      <p className="small text-stone-500 mb-0">Select Main Image</p>
+                    </div>
+                  )}
+                  <input 
+                    id="mainImageInput"
+                    type="file" 
+                    className="d-none" 
+                    accept="image/*"
+                    onChange={(e) => setProductImage(e.target.files[0])}
+                  />
+                </div>
+              </div>
+              <div className="col-md-6">
                 <div className="mb-4">
                   <label className="form-label">Product Title</label>
                   <input

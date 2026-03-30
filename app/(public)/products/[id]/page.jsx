@@ -6,8 +6,9 @@ import ProductsScroll from "@/components/ProductsScroll";
 import { RevealWrapper, RevealItem } from "@/components/animations/RevealAnimation";
 
 export async function generateMetadata({ params }) {
+  const resolvedParams = await params;
   const products = await getProducts();
-  const product = products.find((p) => p.id === parseInt(params.id));
+  const product = products.find((p) => p.id === parseInt(resolvedParams.id));
 
   if (!product) return { title: "Product Not Found" };
 

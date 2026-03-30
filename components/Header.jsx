@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import axios from "axios";
+import api from "@/lib/axios";
 
 export default function Header() {
   const { user, role, logout, token } = useAuth();
@@ -57,9 +57,7 @@ export default function Header() {
         return;
       }
       try {
-        const res = await axios.get(`${API_URL}api/shop/cart/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get(`/api/shop/cart/`);
         const totalItems = res.data.items.reduce((acc, item) => acc + item.quantity, 0);
         setCartCount(totalItems);
       } catch (err) {
@@ -192,7 +190,7 @@ export default function Header() {
                       </div>
                     </div>
                   </>
-                ) : (
+                ) : mounted && !user ? (
                   <Link
                     href="/login"
                     className="flex items-center space-x-2 text-stone-300 hover:text-amber-400 font-medium text-sm transition-colors"
@@ -200,7 +198,7 @@ export default function Header() {
                     <i className="fas fa-user text-lg"></i>
                     <span>Login</span>
                   </Link>
-                )}
+                ) : null}
               </div>
 
               {/* CTA Button */}
@@ -388,7 +386,7 @@ export default function Header() {
                     </a>
                   </div>
                 </div>
-              ) : (
+              ) : mounted && !user ? (
                 <Link
                   href="/login"
                   className="flex items-center justify-center w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl border border-white/20 transition-colors font-medium"
@@ -397,7 +395,7 @@ export default function Header() {
                   <i className="fas fa-user mr-2"></i>
                   Login / Sign Up
                 </Link>
-              )}
+              ) : null}
             </div>
           </nav>
         </div>

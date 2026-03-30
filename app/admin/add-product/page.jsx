@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import axios from "axios";
 import api from "@/lib/axios";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
@@ -12,6 +11,7 @@ export default function AdminAddProduct() {
   const { token, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [productImage, setProductImage] = useState(null);
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
 
   const [variants, setVariants] = useState([
@@ -121,13 +121,19 @@ const handleSubmit = async (e) => {
     const title = document.getElementById('productName').value;
     const introduction = document.getElementById('productIntro').value;
     const description = document.getElementById('productDescription').value;
+    const basePrice = document.getElementById('basePrice').value;
     
-    console.log('Form values:', { title, introduction, description });
+    console.log('Form values:', { title, introduction, description, basePrice });
     
     // Basic Product Info
     formData.append('title', title);
     formData.append('introduction', introduction);
     formData.append('details', description);
+    formData.append('price', basePrice);
+    
+    if (productImage) {
+      formData.append('image', productImage);
+    }
     
     // Loop through variants and add each field individually
     variants.forEach((variant, index) => {
@@ -159,10 +165,14 @@ const handleSubmit = async (e) => {
       console.log('FormData entry:', pair[0], pair[1] instanceof File ? pair[1].name : pair[1]);
     }
     
-    // Make the request using our centralized api instance
-    const res = await api.post("api/shop/products/", formData);
+    // Get the current token
+    let currentToken = localStorage.getItem("melova_token");
+    console.log('Using token:', currentToken ? 'Token exists' : 'No token');
     
-    console.log('Product created successfully:', res.data);
+    // Make the request using shared api instance for auto-refresh
+    const response = await api.post(`/api/shop/products/`, formData);
+    
+    console.log('Product created successfully:', response.data);
 
     // Success - redirect to products list
     router.push('/admin/products');
@@ -171,14 +181,14 @@ const handleSubmit = async (e) => {
       console.error('Submission error:', err);
 
       // Check if it's an authentication error
-      if (err.message.includes('401') || err.message.includes('Unauthorized') || err.message.includes('token')) {
+      if (err.response?.status === 401) {
         setError('Session expired. Please login again.');
         logout();
         setTimeout(() => {
           router.push('/admin/login?redirect=/admin/products/add');
         }, 1500);
       } else {
-        setError(err.message || 'Failed to create product');
+        setError(err.response?.data ? JSON.stringify(err.response.data) : (err.message || 'Failed to create product'));
       }
     } finally {
       setLoading(false);
@@ -324,7 +334,49 @@ const handleSubmit = async (e) => {
               </div>
               <div className="card-body p-4 p-md-5">
                 <div className="row g-4">
-                  <div className="col-md-8">
+                  <div className="col-md-3">
+                    <label className="form-label">Featured Product Image</label>
+                    <div 
+                      className="border-2 border-dashed rounded-xl p-3 text-center cursor-pointer hover:bg-stone-50 transition-all border-stone-200"
+                      onClick={() => document.getElementById('mainImageInput').click()}
+                    >
+                      {productImage ? (
+                        <div className="position-relative">
+                        <a 
+                          href={URL.createObjectURL(productImage)} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="d-block"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Image
+                            src={URL.createObjectURL(productImage)}
+                            alt="Main Preview"
+                            width={400}
+                            height={400}
+                            quality={100}
+                            className="rounded-lg object-fit-cover mx-auto shadow-md hover:scale-[1.02] transition-transform duration-200"
+                            style={{ height: '240px', width: '240px', cursor: 'zoom-in' }}
+                          />
+                        </a>
+                          <p className="mt-2 text-xs text-stone-500">Click to change</p>
+                        </div>
+                      ) : (
+                        <div className="py-4">
+                          <i className="fas fa-cloud-upload-alt text-3xl text-stone-300 mb-2"></i>
+                          <p className="small text-stone-500 mb-0">Select Main Image</p>
+                        </div>
+                      )}
+                      <input 
+                        id="mainImageInput"
+                        type="file" 
+                        className="d-none" 
+                        accept="image/*"
+                        onChange={(e) => setProductImage(e.target.files[0])}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-5">
                     <div className="mb-4">
                       <label htmlFor="productName" className="form-label">
                         Product Title

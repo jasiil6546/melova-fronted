@@ -92,9 +92,19 @@ export default function AdminProducts() {
       )
     ) {
       try {
-        const res = await api.delete(`api/shop/products/${id}/`);
-        setProducts((prev) => prev.filter((p) => p.id !== id));
-        console.log(`Product ${id} deleted successfully.`);
+        const res = await api.delete(`/api/shop/products/${id}/`);
+
+        if (res.status === 204 || (res.status >= 200 && res.status < 300)) {
+          setProducts((prev) => prev.filter((p) => p.id !== id));
+          console.log(`Product ${id} deleted successfully.`);
+        } else {
+          try {
+            const errorData = await res.json();
+            alert(`Delete failed: ${JSON.stringify(errorData)}`);
+          } catch (e) {
+            alert(`Delete failed with status: ${res.status}`);
+          }
+        }
       } catch (error) {
         console.error("Error deleting product:", error);
         alert("An error occurred while deleting the product.");
@@ -214,9 +224,12 @@ export default function AdminProducts() {
                     {/* ID */}
                     <td className="px-3 py-2 font-medium">{product.id}</td>
 
-                    {/* Image */}
-                    <td className="px-3 py-2">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 relative">
+                    <td className="px-3 py-2 leading-none">
+                      <Link 
+                        href={`/admin/edit-product/${product.id}`}
+                        className="block w-12 h-12 rounded-lg overflow-hidden bg-gray-100 relative hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition-all duration-200 shadow-sm"
+                        title="Edit Product"
+                      >
                         {product.image ? (
                           <Image
                             src={product.image}
@@ -226,11 +239,11 @@ export default function AdminProducts() {
                             className="object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-1">
-                            No Image
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-1 font-medium bg-gray-100">
+                            N/A
                           </div>
                         )}
-                      </div>
+                      </Link>
                     </td>
 
                     {/* Name */}

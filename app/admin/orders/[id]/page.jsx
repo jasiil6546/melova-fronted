@@ -13,16 +13,14 @@ export default function AdminOrderDetails() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/";
 
   useEffect(() => {
     async function fetchOrderDetails() {
       if (!token || !id) return;
 
       try {
-        const response = await api.get(`api/shop/orders/${id}/`);
-        const data = response.data;
-        setOrder(data);
+        const response = await api.get(`/api/shop/orders/${id}/`);
+        setOrder(response.data);
       } catch (error) {
         console.error("Error fetching order details:", error);
       } finally {
@@ -30,15 +28,17 @@ export default function AdminOrderDetails() {
       }
     }
     fetchOrderDetails();
-  }, [token, id, API_URL]);
+  }, [token, id]);
 
   const updateStatus = async (newStatus) => {
     setUpdating(true);
 
     try {
-      const response = await api.patch(`api/shop/orders/${id}/`, { status: newStatus });
-      const updatedOrder = response.data;
-      setOrder(updatedOrder);
+      const response = await api.patch(`/api/shop/orders/${id}/`, { 
+        status: newStatus 
+      });
+
+      setOrder(response.data);
       alert(`Order status updated to ${newStatus}`);
     } catch (error) {
       console.error("Error updating order status:", error);
